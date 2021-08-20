@@ -39,9 +39,8 @@ function getStartFillerDates(firstDay) {
 	}
 
 	const days = [];
-	let index = weekDays.indexOf(weekDay);
 
-	for (let i = 0; i < index; i++) {
+	for (let i = 0; i < weekDays.indexOf(weekDay); i++) {
 		const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 		days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
 	}
@@ -53,24 +52,20 @@ function getEndFillerDates(lastDay) {
 	const day = lastDay.getDay();
 	const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
 
-	if (weekDay === weekDays[weekDays.length - 1]) {
-		return [];
-	}
-
-	let index = weekDays.indexOf(weekDay);
-
 	let nextMonth = lastDay.getMonth() + 1;
 	if (nextMonth >= months.length) nextMonth = 0;
 
 	let year = lastDay.getFullYear();
-	console.log(nextMonth, months.length - 1);
 	if (nextMonth <= 0) year += 1;
 
-	const days = getDaysFromMonth(nextMonth, year).slice(0, weekDays.length - index - 1);
+	if (weekDay === weekDays[weekDays.length - 1]) {
+		return getDaysFromMonth(nextMonth, year).slice(0, weekDays.length);
+	}
 
-	console.log(days);
-
-	return days;
+	return getDaysFromMonth(nextMonth, year).slice(
+		0,
+		weekDays.length - weekDays.indexOf(weekDay) - 1
+	);
 }
 
 export default function Calendar() {
@@ -149,7 +144,6 @@ const Container = styled.div`
 
 const MonthButtons = styled.div`
 	display: flex;
-	justify-content: space-between;
 	color: rgb(var(--accent));
 	font-size: 1.5rem;
 `;
