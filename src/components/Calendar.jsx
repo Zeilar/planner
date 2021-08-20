@@ -34,6 +34,10 @@ export default function Calendar() {
 	const [year, setYear] = useState(now.getFullYear());
 
 	const days = getDaysFromMonth(month, year);
+	const fillerDays = getDaysFromMonth(month >= months.length - 1 ? 0 : month + 1, year).slice(
+		0,
+		35 - days.length
+	);
 
 	function isToday(date) {
 		const now = new Date();
@@ -78,6 +82,11 @@ export default function Calendar() {
 					<Day className={classNames({ active: isToday(day) })} key={i}>
 						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</Day>
+				))}
+				{fillerDays.map((day, i) => (
+					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
+						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
+					</FillerDay>
 				))}
 			</Days>
 		</Container>
@@ -133,6 +142,10 @@ const Day = styled.div`
 	&:hover {
 		background-color: rgb(35, 35, 35);
 	}
+`;
+
+const FillerDay = styled(Day)`
+	background-color: rgb(20, 20, 20);
 `;
 
 const DayNumber = styled.span`
