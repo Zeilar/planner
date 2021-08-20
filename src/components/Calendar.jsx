@@ -18,6 +18,8 @@ const months = [
 	"december",
 ];
 
+const weekDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
 function getDaysFromMonth(month, year) {
 	const date = new Date(year, month, 1);
 	const days = [];
@@ -28,16 +30,57 @@ function getDaysFromMonth(month, year) {
 	return days;
 }
 
+function getStartFillerDates(firstDay) {
+	const day = firstDay.getDay();
+	const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
+
+	if (weekDay === weekDays[0]) {
+		return [];
+	}
+
+	const days = [];
+	let index = weekDays.indexOf(weekDay);
+
+	for (let i = 0; i < index; i++) {
+		const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+		days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
+	}
+
+	return days.reverse();
+}
+
+function getEndFillerDates(lastDay) {
+	const day = lastDay.getDay();
+	const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
+
+	if (weekDay === weekDays[weekDays.length - 1]) {
+		return [];
+	}
+
+	let index = weekDays.indexOf(weekDay);
+
+	let nextMonth = lastDay.getMonth() + 1;
+	if (nextMonth >= months.length) nextMonth = 0;
+
+	let year = lastDay.getFullYear();
+	console.log(nextMonth, months.length - 1);
+	if (nextMonth <= 0) year += 1;
+
+	const days = getDaysFromMonth(nextMonth, year).slice(0, weekDays.length - index - 1);
+
+	console.log(days);
+
+	return days;
+}
+
 export default function Calendar() {
 	const now = new Date();
 	const [month, setMonth] = useState(now.getMonth());
 	const [year, setYear] = useState(now.getFullYear());
 
 	const days = getDaysFromMonth(month, year);
-	const fillerDays = getDaysFromMonth(month >= months.length - 1 ? 0 : month + 1, year).slice(
-		0,
-		35 - days.length
-	);
+	const fillerDaysStart = getStartFillerDates(days[0]);
+	const fillerDaysEnd = getEndFillerDates(days[days.length - 1]);
 
 	function isToday(date) {
 		const now = new Date();
@@ -78,14 +121,19 @@ export default function Calendar() {
 				<MonthButton onClick={nextMonth}>{months[month + 1] ?? months[0]}</MonthButton>
 			</MonthButtons>
 			<Days>
+				{fillerDaysStart.map((day, i) => (
+					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
+						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
+					</FillerDay>
+				))}
 				{days.map((day, i) => (
 					<Day className={classNames({ active: isToday(day) })} key={i}>
-						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
+						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
 					</Day>
 				))}
-				{fillerDays.map((day, i) => (
+				{fillerDaysEnd.map((day, i) => (
 					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
-						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
+						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
 					</FillerDay>
 				))}
 			</Days>
@@ -97,13 +145,6 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	width: calc(7 * 150px);
-`;
-
-const Days = styled.div`
-	display: grid;
-	width: calc(7 * 150px);
-	grid-template-columns: repeat(7, 1fr);
-	grid-gap: 2px;
 `;
 
 const MonthButtons = styled.div`
@@ -119,6 +160,13 @@ const MonthButton = styled.button`
 	background: none;
 	font-weight: 900;
 	border: 0;
+`;
+
+const Days = styled.div`
+	display: grid;
+	width: calc(7 * 150px);
+	grid-template-columns: repeat(7, 1fr);
+	grid-gap: 2px;
 `;
 
 const Day = styled.div`
@@ -144,12 +192,15 @@ const Day = styled.div`
 	}
 `;
 
-const FillerDay = styled(Day)`
-	background-color: rgb(20, 20, 20);
-`;
-
 const DayNumber = styled.span`
 	margin-left: 0.75rem;
 	margin-top: 0.75rem;
 	color: rgb(var(--accent));
+`;
+
+const FillerDay = styled(Day)`
+	background-color: rgb(20, 20, 20);
+	${DayNumber} {
+		color: rgb(150, 150, 150);
+	}
 `;
