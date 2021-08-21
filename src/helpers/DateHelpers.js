@@ -47,10 +47,10 @@ export class DateHelpers {
 		const days = [];
 
 		for (let i = 0; i < weekDays.indexOf(weekDay); i++) {
-			days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
+			days.unshift(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
 		}
 
-		return days.reverse();
+		return days;
 	}
 
 	static getEndFillerDates(lastDay, amount) {
