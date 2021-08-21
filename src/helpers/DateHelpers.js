@@ -23,6 +23,8 @@ export const weekDays = [
 	"sunday",
 ];
 
+export const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+
 export class DateHelpers {
 	static getDaysFromMonth(month, year) {
 		const date = new Date(year, month, 1);
@@ -45,7 +47,6 @@ export class DateHelpers {
 		const days = [];
 
 		for (let i = 0; i < weekDays.indexOf(weekDay); i++) {
-			const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 			days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
 		}
 
