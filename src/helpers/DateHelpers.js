@@ -52,23 +52,13 @@ export class DateHelpers {
 		return days.reverse();
 	}
 
-	static getEndFillerDates(lastDay) {
-		const day = lastDay.getDay();
-		const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
-
+	static getEndFillerDates(lastDay, amount) {
 		let nextMonth = lastDay.getMonth() + 1;
 		if (nextMonth >= months.length) nextMonth = 0;
 
 		let year = lastDay.getFullYear();
 		if (nextMonth <= 0) year += 1;
 
-		if (weekDay === weekDays[weekDays.length - 1]) {
-			return this.getDaysFromMonth(nextMonth, year).slice(0, weekDays.length);
-		}
-
-		return this.getDaysFromMonth(nextMonth, year).slice(
-			0,
-			weekDays.length - weekDays.indexOf(weekDay) - 1
-		);
+		return this.getDaysFromMonth(nextMonth, year).slice(0, amount);
 	}
 }

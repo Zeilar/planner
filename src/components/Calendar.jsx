@@ -10,9 +10,12 @@ export default function Calendar() {
 	const [month, setMonth] = useState(now.getMonth());
 	const [year, setYear] = useState(now.getFullYear());
 
-	const days = DateHelpers.getDaysFromMonth(month, year);
-	const fillerDaysStart = DateHelpers.getStartFillerDates(days[0]);
-	const fillerDaysEnd = DateHelpers.getEndFillerDates(days[days.length - 1]);
+	const days = DateHelpers.getDaysFromMonth(month, year),
+		fillerDaysStart = DateHelpers.getStartFillerDates(days[0]),
+		fillerDaysEnd = DateHelpers.getEndFillerDates(
+			days[days.length - 1],
+			42 - days.length - fillerDaysStart.length
+		);
 
 	function isToday(date) {
 		const now = new Date();
@@ -55,17 +58,17 @@ export default function Calendar() {
 			<Days>
 				{fillerDaysStart.map((day, i) => (
 					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
-						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
+						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</FillerDay>
 				))}
 				{days.map((day, i) => (
 					<Day className={classNames({ active: isToday(day) })} key={i}>
-						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
+						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</Day>
 				))}
 				{fillerDaysEnd.map((day, i) => (
 					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
-						<DayNumber>{dayjs(day).format("DD dddd")}</DayNumber>
+						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</FillerDay>
 				))}
 			</Days>
@@ -100,6 +103,12 @@ const Days = styled.div`
 	grid-gap: 2px;
 `;
 
+const DayNumber = styled.span`
+	margin-left: 0.75rem;
+	margin-top: 0.75rem;
+	color: white;
+`;
+
 const Day = styled.div`
 	display: flex;
 	background-color: rgb(30, 30, 30);
@@ -117,16 +126,16 @@ const Day = styled.div`
 			height: 4px;
 			background-color: rgb(var(--accent));
 		}
+		${DayNumber} {
+			color: rgb(var(--accent));
+		}
 	}
 	&:hover {
 		background-color: rgb(35, 35, 35);
+		${DayNumber} {
+			color: rgb(var(--accent));
+		}
 	}
-`;
-
-const DayNumber = styled.span`
-	margin-left: 0.75rem;
-	margin-top: 0.75rem;
-	color: rgb(var(--accent));
 `;
 
 const FillerDay = styled(Day)`
