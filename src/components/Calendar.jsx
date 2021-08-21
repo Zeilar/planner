@@ -2,80 +2,17 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { useState } from "react";
 import styled from "styled-components";
-
-const months = [
-	"january",
-	"february",
-	"march",
-	"april",
-	"may",
-	"june",
-	"july",
-	"august",
-	"september",
-	"october",
-	"november",
-	"december",
-];
-
-const weekDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-
-function getDaysFromMonth(month, year) {
-	const date = new Date(year, month, 1);
-	const days = [];
-	while (date.getMonth() === month) {
-		days.push(new Date(date));
-		date.setDate(date.getDate() + 1);
-	}
-	return days;
-}
-
-function getStartFillerDates(firstDay) {
-	const day = firstDay.getDay();
-	const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
-
-	if (weekDay === weekDays[0]) {
-		return [];
-	}
-
-	const days = [];
-
-	for (let i = 0; i < weekDays.indexOf(weekDay); i++) {
-		const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
-		days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
-	}
-
-	return days.reverse();
-}
-
-function getEndFillerDates(lastDay) {
-	const day = lastDay.getDay();
-	const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
-
-	let nextMonth = lastDay.getMonth() + 1;
-	if (nextMonth >= months.length) nextMonth = 0;
-
-	let year = lastDay.getFullYear();
-	if (nextMonth <= 0) year += 1;
-
-	if (weekDay === weekDays[weekDays.length - 1]) {
-		return getDaysFromMonth(nextMonth, year).slice(0, weekDays.length);
-	}
-
-	return getDaysFromMonth(nextMonth, year).slice(
-		0,
-		weekDays.length - weekDays.indexOf(weekDay) - 1
-	);
-}
+import { DateHelpers, months } from "../helpers/DateHelpers";
 
 export default function Calendar() {
 	const now = new Date();
+
 	const [month, setMonth] = useState(now.getMonth());
 	const [year, setYear] = useState(now.getFullYear());
 
-	const days = getDaysFromMonth(month, year);
-	const fillerDaysStart = getStartFillerDates(days[0]);
-	const fillerDaysEnd = getEndFillerDates(days[days.length - 1]);
+	const days = DateHelpers.getDaysFromMonth(month, year);
+	const fillerDaysStart = DateHelpers.getStartFillerDates(days[0]);
+	const fillerDaysEnd = DateHelpers.getEndFillerDates(days[days.length - 1]);
 
 	function isToday(date) {
 		const now = new Date();

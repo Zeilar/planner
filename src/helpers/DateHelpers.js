@@ -1,24 +1,30 @@
+export const months = [
+	"january",
+	"february",
+	"march",
+	"april",
+	"may",
+	"june",
+	"july",
+	"august",
+	"september",
+	"october",
+	"november",
+	"december",
+];
+
+export const weekDays = [
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+];
+
 export class DateHelpers {
-	months = [
-		"january",
-		"february",
-		"march",
-		"april",
-		"may",
-		"june",
-		"july",
-		"august",
-		"september",
-		"october",
-		"november",
-		"december",
-	];
-
-	weekDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-
-	DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
-
-	getDaysFromMonth(month, year) {
+	static getDaysFromMonth(month, year) {
 		const date = new Date(year, month, 1);
 		const days = [];
 		while (date.getMonth() === month) {
@@ -28,27 +34,41 @@ export class DateHelpers {
 		return days;
 	}
 
-	getStartFillerDates(firstDay) {
+	static getStartFillerDates(firstDay) {
 		const day = firstDay.getDay();
-		const weekDay =
-			day - 1 <= 0 ? this.weekDays[this.weekDays.length - 1] : this.weekDays[day - 1];
-		const days = [];
-		for (let i = this.weekDays.indexOf(weekDay) - 1; i >= 0; i--) {
-			days.push(new Date(firstDay.getTime() - this.DAY_IN_MILLISECONDS * i - 1));
+		const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
+
+		if (weekDay === weekDays[0]) {
+			return [];
 		}
-		return days;
+
+		const days = [];
+
+		for (let i = 0; i < weekDays.indexOf(weekDay); i++) {
+			const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+			days.push(new Date(firstDay.getTime() - DAY_IN_MILLISECONDS * (i + 1)));
+		}
+
+		return days.reverse();
 	}
 
-	getEndFillerDates(lastDay) {
+	static getEndFillerDates(lastDay) {
 		const day = lastDay.getDay();
-		const weekDay =
-			day - 1 <= 0 ? this.weekDays[this.weekDays.length - 1] : this.weekDays[day - 1];
-		const days = [];
-		let i = this.weekDays.indexOf(weekDay);
-		while (this.weekDays[i] !== this.weekDays[this.weekDays.length - 1]) {
-			days.push(new Date(lastDay.getTime() - this.DAY_IN_MILLISECONDS * i - 1));
-			i++;
+		const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
+
+		let nextMonth = lastDay.getMonth() + 1;
+		if (nextMonth >= months.length) nextMonth = 0;
+
+		let year = lastDay.getFullYear();
+		if (nextMonth <= 0) year += 1;
+
+		if (weekDay === weekDays[weekDays.length - 1]) {
+			return this.getDaysFromMonth(nextMonth, year).slice(0, weekDays.length);
 		}
-		return days;
+
+		return this.getDaysFromMonth(nextMonth, year).slice(
+			0,
+			weekDays.length - weekDays.indexOf(weekDay) - 1
+		);
 	}
 }
