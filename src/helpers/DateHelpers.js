@@ -36,7 +36,7 @@ export class DateHelpers {
 		return days;
 	}
 
-	static getStartFillerDates(firstDay) {
+	static getEndOfPreviousMonth(firstDay) {
 		const day = firstDay.getDay();
 		const weekDay = day <= 0 ? weekDays[weekDays.length - 1] : weekDays[day - 1];
 
@@ -53,7 +53,7 @@ export class DateHelpers {
 		return days;
 	}
 
-	static getEndFillerDates(lastDay, amount) {
+	static getStartOfNextMonth(lastDay, amount) {
 		let nextMonth = lastDay.getMonth() + 1;
 		if (nextMonth >= months.length) nextMonth = 0;
 
@@ -61,5 +61,18 @@ export class DateHelpers {
 		if (nextMonth <= 0) year += 1;
 
 		return this.getDaysFromMonth(nextMonth, year).slice(0, amount);
+	}
+
+	static isToday(date) {
+		const now = new Date();
+		return (
+			date.getFullYear() === now.getFullYear() &&
+			date.getMonth() === now.getMonth() &&
+			date.getDate() === now.getDate()
+		);
+	}
+
+	static toString(date) {
+		return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 	}
 }

@@ -3,27 +3,26 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import styled from "styled-components";
 import { DateHelpers, months } from "../helpers/DateHelpers";
+import Modal from "./Modal";
 
 export default function Calendar() {
 	const now = new Date();
 
 	const [month, setMonth] = useState(now.getMonth());
 	const [year, setYear] = useState(now.getFullYear());
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalDate, setModalDate] = useState();
 
 	const days = DateHelpers.getDaysFromMonth(month, year),
-		fillerDaysStart = DateHelpers.getStartFillerDates(days[0]),
-		fillerDaysEnd = DateHelpers.getEndFillerDates(
+		fillerDaysStart = DateHelpers.getEndOfPreviousMonth(days[0]),
+		fillerDaysEnd = DateHelpers.getStartOfNextMonth(
 			days[days.length - 1],
 			42 - days.length - fillerDaysStart.length
 		);
 
-	function isToday(date) {
-		const now = new Date();
-		return (
-			date.getFullYear() === now.getFullYear() &&
-			date.getMonth() === now.getMonth() &&
-			date.getDate() === now.getDate()
-		);
+	function openModal(date) {
+		setModalDate(date);
+		setModalOpen(true);
 	}
 
 	function nextMonth() {
@@ -46,6 +45,7 @@ export default function Calendar() {
 
 	return (
 		<Container>
+			{modalOpen && <Modal date={modalDate} close={() => setModalOpen(false)} />}
 			<MonthButtons>
 				<MonthButton onClick={previousMonth}>
 					{months[month - 1] ?? months[months.length - 1]}
@@ -57,17 +57,29 @@ export default function Calendar() {
 			</MonthButtons>
 			<Days>
 				{fillerDaysStart.map((day, i) => (
-					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
+					<FillerDay
+						className={classNames({ active: DateHelpers.isToday(day) })}
+						onClick={() => openModal(day)}
+						key={i}
+					>
 						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</FillerDay>
 				))}
 				{days.map((day, i) => (
-					<Day className={classNames({ active: isToday(day) })} key={i}>
+					<Day
+						className={classNames({ active: DateHelpers.isToday(day) })}
+						onClick={() => openModal(day)}
+						key={i}
+					>
 						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</Day>
 				))}
 				{fillerDaysEnd.map((day, i) => (
-					<FillerDay className={classNames({ active: isToday(day) })} key={i}>
+					<FillerDay
+						className={classNames({ active: DateHelpers.isToday(day) })}
+						onClick={() => openModal(day)}
+						key={i}
+					>
 						<DayNumber>{dayjs(day).format("DD")}</DayNumber>
 					</FillerDay>
 				))}
